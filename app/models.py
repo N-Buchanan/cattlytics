@@ -11,6 +11,6 @@ class Animal(db.Model):
 
 class Weight(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    animal_id = db.Column(db.String(15), db.ForeignKey('animal.id'))
-    weight = db.Column(db.Float)
-    date = db.Column(db.Date)
+    animal_id = db.Column(db.String(15), db.ForeignKey('animal.id'), nullable=False)
+    weight = db.Column(db.Float, nullable=False)
+    date = db.Column(db.Date, nullable=False)

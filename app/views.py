@@ -22,6 +22,16 @@ def add_animal():
 
         db.session.add(animal)
         db.session.commit()
+
+        # this needs to be after the database commit so that sqlalchemy can generate an id for animal
+        # create first weight for animal with its birth date
+        weight = Weight(animal_id=animal.id,
+                       weight=animal.birth_weight,
+                       date=animal.birth_date)
+
+        db.session.add(weight)
+        db.session.commit()
+
         return redirect(url_for('index'))
     return render_template('new_animal.html', title='Cattlytics: Add Animal',  form=form)
 
