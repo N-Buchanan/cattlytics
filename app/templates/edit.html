@@ -1,0 +1,56 @@
+{% extends 'base.html' %}
+
+
+
+{% block content %}
+    <h1>Update Animal Data</h1>
+
+
+<form action="" method="post" name="edit">
+    {{ form.hidden_tag() }}
+
+    <p>
+        Primary Tag
+        {{ form.primary_tag(size=15) }}
+        {% if 'primary_tag' in form.errors %}
+        <p style="color: red">This Field is required</p>
+        {% endif %}
+    </p>
+    <p>
+        Birth Date
+        {{ form.birth_date }}
+        {% if 'birth_date' in form.errors %}
+            <p style="color: red">This field is required</p>
+        {% endif %}
+    </p>
+    <p>
+        Birth Weight
+        {{ form.birth_weight }}
+        {% if 'birth_weight' in form.errors %}
+            <p style="color: red">This field is required</p>
+        {% endif %}
+    </p>
+
+    {{ form.submit }}
+
+
+</form>
+<h1>Animal Weights</h1>
+
+    {{ weights_table }}
+
+
+<h3>Add a new Weight for this animal.</h3>
+    <form action="{{ url_for('add_weight') }}" method="post" name="">
+    {{ weight_form.hidden_tag() }}
+
+        <p>Date {{ weight_form.date }}</p>
+        <p>Weight {{ weight_form.weight }}</p>
+
+        {% if weight_form.errors %}
+            <p style="color:red">Both Fields need to be filled out</p>
+        {% endif %}
+    {{ weight_form.submit }}
+    </form>
+
+{% endblock %}
