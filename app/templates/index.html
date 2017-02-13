@@ -11,12 +11,16 @@
 {% block scripts %}
 <script>
 // copied wholesale from https://stackoverflow.com/questions/14267781/sorting-html-table-with-javascript
+// added minor change to parse numbers by value instead of lexicographically
     function sortTable(table, col, reverse) {
     var tb = table.tBodies[0], // use `<tbody>` to ignore `<thead>` and `<tfoot>` rows
         tr = Array.prototype.slice.call(tb.rows, 0), // put rows into array
         i;
     reverse = -((+reverse) || -1);
     tr = tr.sort(function (a, b) { // sort rows
+        if (!isNaN(parseFloat(a.cells[col].textContent.trim()))) {
+            return reverse * (parseFloat(a.cells[col].textContent.trim()) - parseFloat(b.cells[col].textContent.trim()));
+        }
         return reverse // `-1 *` if want opposite order
             * (a.cells[col].textContent.trim() // using `.textContent.trim()` for test
                 .localeCompare(b.cells[col].textContent.trim())
