@@ -8,6 +8,9 @@ class AnimalTable(Table):
                           url_kwargs=dict(animal_id='id'))
     birth_date = DateCol('Birth Date')
     birth_weight = Col('Birth Weight')
+    dam = Col('Dam')
+    sire = Col('Sire')
+    sex = Col('Sex')
 
 
 class WeightTable(Table):
