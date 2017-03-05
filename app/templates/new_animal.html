@@ -6,7 +6,37 @@
     <h1>Create a new Animal</h1>
 
 
-<form action="" method="post" name="edit">
+{#<form action="" method="post" name="edit">#}
+{#    {{ form.hidden_tag() }}#}
+{##}
+{#    <p>#}
+{#        Primary Tag#}
+{#        {{ form.primary_tag(size=15) }}#}
+{#        {% if 'primary_tag' in form.errors %}#}
+{#        <p style="color: red">This Field is required</p>#}
+{#        {% endif %}#}
+{#    </p>#}
+{#    <p>#}
+{#        Birth Date#}
+{#        {{ form.birth_date }}#}
+{#        {% if 'birth_date' in form.errors %}#}
+{#            <p style="color: red">This field is required</p>#}
+{#        {% endif %}#}
+{#    </p>#}
+{#    <p>#}
+{#        Birth Weight#}
+{#        {{ form.birth_weight }}#}
+{#        {% if 'birth_weight' in form.errors %}#}
+{#            <p style="color: red">This field is required</p>#}
+{#        {% endif %}#}
+{#    </p>#}
+{##}
+{#    {{ form.submit }}#}
+{##}
+{##}
+{#</form>#}
+
+    <form action="" method="post" name="edit">
     {{ form.hidden_tag() }}
 
     <p>
@@ -30,6 +60,18 @@
             <p style="color: red">This field is required</p>
         {% endif %}
     </p>
+<p>
+    Dam
+    {{ form.dam }}
+</p>
+<p>
+    Sire
+    {{ form.sire }}
+</p>
+<p>
+    Sex
+    {{ form.sex }}
+</p>
 
     {{ form.submit }}
 

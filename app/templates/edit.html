@@ -1,5 +1,13 @@
 {% extends 'base.html' %}
 
+{% block style %}
+<style>
+.table td:nth-child(1), .table th:nth-child(1) {
+    display:none
+}
+</style>
+{% endblock %}
+
 {% block scripts %}
     <script src="../static/sort_tables.js"></script>
 {% endblock %}
@@ -49,7 +57,15 @@
 
 
 </form>
+
+    <a href="/delete_animal/{{ animal }}">Delete Animal</a>
+
+    <p>{{ form.primary_tag.data }} is {{ age }} days old.</p>
 <h1>Animal Weights</h1>
+
+    {% if adjusted_weight  %}
+        <p>{{ form.primary_tag.data }}'s adjusted 205 day weight is {{ adjusted_weight }}</p>
+    {% endif %}
 
     {{ weights_table }}
 
@@ -60,9 +76,10 @@
 
         <p>Date {{ weight_form.date }}</p>
         <p>Weight {{ weight_form.weight }}</p>
+        <p>This is the weaning weight {{ weight_form.weaning }}</p>
 
         {% if weight_form.errors %}
-            <p style="color:red">Both Fields need to be filled out</p>
+            <p style="color:red">Both Weight and Date Fields need to be filled out</p>
         {% endif %}
     {{ weight_form.submit }}
     </form>
