@@ -28,17 +28,31 @@ def index():
 def add_animal():
     form = EditAnimalForm()
     if form.validate_on_submit():
-        # animal = Animal(primary_tag=form.primary_tag.data,
-        #                 birth_date=form.birth_date.data,
-        #                 birth_weight=form.birth_weight.data)
+        # It's possible that we've already added this animal if the user previously added an animal and listed
+        # Dam and Sire that did not yet exist. In that case we add them to the database anyway for ease of reference
+        # so it's possible that this is that "shadow" animal we added. So we'll check the database first to see if any
+        # such animal exists
 
-        animal = Animal()
-        # form.populate_obj(animal)
+        animal = Animal.query.filter_by(primary_tag=form.primary_tag.data).first()
+
+        # If there is an animal already with that primary_tag then we should check if we put it there or if the user did
+        # The add animal form doesn't validate if they don't provide a birth weight so that's how we'll check who added it
+        if animal is not None and animal.birth_weight is not None:
+            # they added it so we should warn them that they are about to overwrite an existing animal
+            return render_template('new_animal.html',
+                                   title='Cattlytics: Add Animal',
+                                   form=form,
+                                   warning='There is already an animal with that primary tag. Please choose another one')
+
+        if animal is None:
+            animal = Animal()
+
+        # at this point it's safe to add the animal to the database
         animal.primary_tag = form.primary_tag.data
         animal.sex = form.sex.data
         animal.birth_date = form.birth_date.data
         animal.birth_weight = form.birth_weight.data
-        animal.sex = animal.sex[:1].upper()
+        animal.sex = animal.sex[:1].upper() # only put 'M' or 'F' in database for simplicity with data analysis and querying
 
         # if the dam doesn't exist in the database, create it and get an id
         if form.dam.data:  # but only if a dam was given
