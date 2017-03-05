@@ -1,4 +1,4 @@
-from flask_table import Table, Col, LinkCol, DateCol
+from flask_table import Table, Col, LinkCol, DateCol, BoolCol
 
 
 class AnimalTable(Table):
@@ -11,9 +11,13 @@ class AnimalTable(Table):
     dam = Col('Dam')
     sire = Col('Sire')
     sex = Col('Sex')
+    weaned = BoolCol('Weaned', yes_display='Weaned', no_display='')
 
 
 class WeightTable(Table):
     classes = ['table']
+    animal_id = Col('Animal ID')
     date = DateCol('Date')
     weight = Col('Weight')
+    weaning = BoolCol('Weaning', yes_display='Weaning', no_display='')
+    delete = LinkCol('Delete', endpoint='delete_weight', url_kwargs=dict(date='date', animal_id='animal_id'))

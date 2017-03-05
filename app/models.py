@@ -11,12 +11,17 @@ class Animal(db.Model):
     sire = db.Column(db.Integer, db.ForeignKey('animal.id'))
     sex = db.Column(db.CHAR)
 
+    def has_weaned(self):
+        weight = Weight.query.filter_by(weaning=True, animal_id=self.id).first()
+        return weight is not None
+
 
 class Weight(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     animal_id = db.Column(db.String(15), db.ForeignKey('animal.id'), nullable=False)
     weight = db.Column(db.Float, nullable=False)
     date = db.Column(db.Date, nullable=False)
+    weaning = db.Column(db.Boolean)
 
 
 class Medicine(db.Model):
