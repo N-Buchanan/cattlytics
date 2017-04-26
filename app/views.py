@@ -15,12 +15,17 @@ def page_not_found(e):
 @app.route('/')
 @app.route('/index')
 def index():
-    # table = AnimalTable(Animal.query.all())
+    # used to map internal database ids to human-readable primary_tag in the animal table
+    name_dict = {}
+
     animals = Animal.query.all()
     for animal in animals:
         animal.weaned = animal.has_weaned()
+        name_dict[animal.id] = animal.primary_tag
 
     table = AnimalTable(animals)
+    table.dam.choices = name_dict
+    table.sire.choices = name_dict
     return render_template('index.html', title='Cattlytics', name='Test', table=table)
 
 

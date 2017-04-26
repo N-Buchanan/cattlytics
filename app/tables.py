@@ -1,15 +1,16 @@
-from flask_table import Table, Col, LinkCol, DateCol, BoolCol
-
+from flask_table import Table, Col, LinkCol, DateCol, BoolCol, OptCol
+from .models import Animal
 
 class AnimalTable(Table):
+
     classes = ['table']
     id = Col('ID')
     primary_tag = LinkCol('Primary Tag', attr='primary_tag', endpoint='edit_animal',
                           url_kwargs=dict(animal_id='id'))
     birth_date = DateCol('Birth Date')
     birth_weight = Col('Birth Weight')
-    dam = Col('Dam')
-    sire = Col('Sire')
+    dam = OptCol('Dam')
+    sire = OptCol('Sire')
     sex = Col('Sex')
     weaned = BoolCol('Weaned', yes_display='Weaned', no_display='')
 
