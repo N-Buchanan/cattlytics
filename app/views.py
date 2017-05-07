@@ -1,8 +1,8 @@
 from flask import render_template, flash, redirect, url_for, request
 from app import app, db
-from .forms import EditAnimalForm, AddWeightForm
+from .forms import EditAnimalForm, AddWeightForm, AddMedicineForm
 from .models import Animal, Weight, Medicine
-from .tables import AnimalTable, WeightTable
+from .tables import AnimalTable, WeightTable, MedicineTable
 import datetime
 from .algorithms.cow_math import calculate_weaning_weight
 
@@ -116,6 +116,12 @@ def edit_animal(animal_id):
     weight_form = AddWeightForm()
     weight_form.animal_id.data = animal.id
 
+    meds = Medicine.query.filter_by(animal_id=animal.id)
+    medicine_table = MedicineTable(meds)
+
+    medicine_form = AddMedicineForm()
+    medicine_form.animal_id.data = animal_id
+
     animal_age = (datetime.date.today() - animal.birth_date).days
 
     adjusted_weight = None
@@ -124,7 +130,7 @@ def edit_animal(animal_id):
 
     return render_template('edit.html', title='Cattlytics: Edit Animal', animal=animal.id,
                            form=form, weights_table=weights_table, weight_form=weight_form,
-                           age=animal_age, adjusted_weight=adjusted_weight)
+                           age=animal_age, adjusted_weight=adjusted_weight, medicine_table=medicine_table, medicine_form=medicine_form)
 
 
 @app.route('/add_weight', methods=['POST'])
@@ -172,3 +178,25 @@ def delete_animal(animal_id):
     db.session.commit()
 
     return redirect(url_for('index'))
+
+@app.route('/add_medicine', methods=['POST'])
+def add_medicine():
+    form = AddMedicineForm()
+
+    if form.validate():
+        medicine = Medicine()
+        form.populate_obj(medicine)
+        db.session.add(medicine)
+        db.session.commit()
+
+    return redirect(url_for('edit_animal', animal_id=form.animal_id.data))
+
+
+@app.route('/delete_medicine/<animal_id>/<date>/<name>', methods=['GET'])
+def delete_medicine(animal_id, date, name):
+    medicine = Medicine.query.filter_by(animal_id=animal_id, date=date, name=name).first()
+
+    db.session.delete(medicine)
+    db.session.commit()
+
+    return redirect(url_for('edit_animal', animal_id=animal_id))

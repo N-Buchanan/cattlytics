@@ -84,4 +84,23 @@
     {{ weight_form.submit }}
     </form>
 
+<h1>Animal Medicine</h1>
+
+    {{ medicine_table }}
+
+    <h3>Add a medicine for this animal.</h3>
+    <form action="{{  url_for('add_medicine') }}" method="post" name="">
+    {{ medicine_form.hidden_tag() }}
+        <p>Name {{ medicine_form.name }}</p>
+        <p>Date {{ medicine_form.date }}</p>
+        <p>Dose {{ medicine_form.dose }}</p>
+        <p>Unit {{ medicine_form.unit }}</p>
+
+        {% if medicine_form.errors %}
+            <p style="color:red">All fields are required</p>
+        {% endif %}
+
+    {{ weight_form.submit }}
+    </form>
+
 {% endblock %}

@@ -23,8 +23,9 @@ class AddWeightForm(FlaskForm):
     weaning = BooleanField()
 
 
-class MedicineForm(FlaskForm):
-    date = DateField('Date Administered')
-    dose = FloatField('Dose Amount')
+class AddMedicineForm(FlaskForm):
+    name = StringField('Name', validators=[DataRequired()])
+    date = DateField('Date Administered', validators=[DataRequired()])
+    dose = FloatField('Dose Amount', validators=[DataRequired()])
     unit = SelectField('Dose Unit', choices=[('ml', 'ml'), ('cc', 'cc')])
     animal_id = HiddenField()

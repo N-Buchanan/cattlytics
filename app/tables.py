@@ -21,3 +21,15 @@ class WeightTable(Table):
     weight = Col('Weight')
     weaning = BoolCol('Weaning', yes_display='Weaning', no_display='')
     delete = LinkCol('Delete', endpoint='delete_weight', url_kwargs=dict(date='date', animal_id='animal_id'))
+
+
+class MedicineTable(Table):
+    classes = ['table']
+    animal_id = Col('Animal ID')
+    name = Col('Name')
+    date = DateCol('Date')
+    dose = Col('Dose')
+    unit = Col('Unit')
+    delete = LinkCol('Delete', endpoint='delete_medicine',
+                     url_kwargs=dict(date='date', animal_id='animal_id', name='name'))
+

@@ -1,6 +1,13 @@
 from app import db
 
 
+class User():
+    id = db.Column(db.Integer, primary_key=True)
+    username = db.Column(db.String(30), index=True, unique=True)
+    password = db.Column(db.String())
+    salt = db.Column(db.Integer())
+
+
 class Animal(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     primary_tag = db.Column(db.String(15), index=True, unique=True)
@@ -26,6 +33,7 @@ class Weight(db.Model):
 
 class Medicine(db.Model):
     id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(100))
     date = db.Column(db.Date)
     dose = db.Column(db.Float)
     unit = db.Column(db.String(10))
