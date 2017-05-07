@@ -35,6 +35,9 @@
 {##}
 {##}
 {#</form>#}
+{% if warning %}
+    <p style="color: red">{{ warning }}</p>
+{% endif %}
 
     <form action="" method="post" name="edit">
     {{ form.hidden_tag() }}
