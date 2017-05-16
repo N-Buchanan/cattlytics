@@ -88,7 +88,7 @@ def add_animal():
                                    warning='There is already an animal with that primary tag. Please choose another one')
 
         if animal is None:
-            animal = Animal()
+            animal = Animal(owner=current_user.id)
 
         # at this point it's safe to add the animal to the database
         animal.primary_tag = form.primary_tag.data
