@@ -1,5 +1,5 @@
 from flask_wtf import FlaskForm
-from wtforms import StringField, FloatField, SubmitField, HiddenField, SelectField, BooleanField
+from wtforms import StringField, FloatField, SubmitField, HiddenField, SelectField, BooleanField, PasswordField
 from wtforms.fields.html5 import DateField
 from wtforms.validators import DataRequired
 
@@ -28,4 +28,18 @@ class AddMedicineForm(FlaskForm):
     date = DateField('Date Administered', validators=[DataRequired()])
     dose = FloatField('Dose Amount', validators=[DataRequired()])
     unit = SelectField('Dose Unit', choices=[('ml', 'ml'), ('cc', 'cc')])
+    submit = SubmitField('Save')
     animal_id = HiddenField()
+
+
+class LoginForm(FlaskForm):
+    username = StringField('Username', validators=[DataRequired()])
+    password = PasswordField('Password', validators=[DataRequired()])
+    submit = SubmitField('Login')
+
+
+class UserRegistrationForm(FlaskForm):
+    username = StringField('Username', validators=[DataRequired()])
+    password = PasswordField('Password', validators=[DataRequired()])
+    email = StringField('Email Address')
+    submit = SubmitField('Login')

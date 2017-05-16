@@ -1,0 +1,14 @@
+{% extends 'base.html' %}
+{% block header_extension %}<a href="/register">Register</a>{% endblock %}
+{% block content %}
+    <h1>Login</h1>
+
+        <form action="" method="post" name="">
+            {{ login_form.hidden_tag() }}
+            <p>Username {{ login_form.username }}</p>
+            <p>Password {{ login_form.password }}</p>
+
+        {{ login_form.submit }}
+        </form>
+
+{% endblock %}

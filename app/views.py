@@ -1,7 +1,8 @@
-from flask import render_template, flash, redirect, url_for, request
-from app import app, db
-from .forms import EditAnimalForm, AddWeightForm, AddMedicineForm
-from .models import Animal, Weight, Medicine
+from flask import render_template, flash, redirect, url_for, request, abort, session
+from flask_login import login_required, login_user, logout_user, current_user
+from app import app, db, login_manager
+from .forms import EditAnimalForm, AddWeightForm, AddMedicineForm, LoginForm, UserRegistrationForm
+from .models import Animal, Weight, Medicine, User
 from .tables import AnimalTable, WeightTable, MedicineTable
 import datetime
 from .algorithms.cow_math import calculate_weaning_weight
@@ -12,13 +13,24 @@ def page_not_found(e):
     return render_template('404.html'), 404
 
 
+@app.errorhandler(401)
+def authentication_failed(e):
+    return render_template('404.html'), 401 # FIXME: need a 401 page
+
+
+@login_manager.user_loader
+def load_user(userid):
+    return User.query.filter_by(id=userid).first()
+
+
 @app.route('/')
 @app.route('/index')
+@login_required
 def index():
     # used to map internal database ids to human-readable primary_tag in the animal table
     name_dict = {}
 
-    animals = Animal.query.all()
+    animals = Animal.query.filter_by(owner=current_user.id).all()
     for animal in animals:
         animal.weaned = animal.has_weaned()
         name_dict[animal.id] = animal.primary_tag
@@ -29,7 +41,33 @@ def index():
     return render_template('index.html', title='Cattlytics', name='Test', table=table)
 
 
+@app.route('/login', methods=['GET', 'POST'])
+def login():
+    form = LoginForm()
+
+    if form.validate():
+        user = User.query.filter_by(username=form.username.data).first()
+        if user.verify_password(form.password.data):
+            login_user(user)
+            return redirect(url_for('index'))
+        else:
+            return abort(401)
+    # else:
+    #     print('couldnt validate?')
+    #     return abort(401)
+
+    return render_template('login.html', login_form=form)
+
+
+@app.route('/logout')
+@login_required
+def logout():
+    logout_user()
+    return redirect(url_for('index'))
+
+
 @app.route('/add', methods=['GET', 'POST'])
+@login_required
 def add_animal():
     form = EditAnimalForm()
     if form.validate_on_submit():
@@ -38,7 +76,7 @@ def add_animal():
         # so it's possible that this is that "shadow" animal we added. So we'll check the database first to see if any
         # such animal exists
 
-        animal = Animal.query.filter_by(primary_tag=form.primary_tag.data).first()
+        animal = Animal.query.filter_by(primary_tag=form.primary_tag.data, owner=current_user.id).first()
 
         # If there is an animal already with that primary_tag then we should check if we put it there or if the user did
         # The add animal form doesn't validate if they don't provide a birth weight so that's how we'll check who added it
@@ -61,7 +99,7 @@ def add_animal():
 
         # if the dam doesn't exist in the database, create it and get an id
         if form.dam.data:  # but only if a dam was given
-            dam = Animal.query.filter_by(primary_tag=form.dam.data).first()
+            dam = Animal.query.filter_by(primary_tag=form.dam.data, owner=current_user.id).first()
             if not dam:
                 dam = Animal(primary_tag=form.dam.data)
                 db.session.add(dam)
@@ -71,7 +109,7 @@ def add_animal():
 
         # same thing with the sire
         if form.sire.data:
-            sire = Animal.query.filter_by(primary_tag=form.sire.data).first()
+            sire = Animal.query.filter_by(primary_tag=form.sire.data, owner=current_user.id).first()
             if not sire:
                 sire = Animal(primary_tag=form.sire.data)
                 db.session.add(sire)
@@ -96,13 +134,14 @@ def add_animal():
 
 
 @app.route('/edit/<animal_id>', methods=['GET', 'POST'])
+@login_required
 def edit_animal(animal_id):
 
     animal = db.session.query(Animal).filter_by(id=animal_id).first()
     form = EditAnimalForm()
 
     if form.validate_on_submit():
-        animal = Animal.query.filter_by(id=form.id.data).first()
+        animal = Animal.query.filter_by(id=form.id.data, owner=current_user.id).first()
 
         # animal.birth_date = form.birth_date.data
         # animal.birth_weight = form.birth_weight.data
@@ -119,12 +158,12 @@ def edit_animal(animal_id):
         form.birth_weight.data = animal.birth_weight
         form.id.data = animal.id
         if animal.dam:
-            dam = Animal.query.filter_by(id=animal.dam).first()
+            dam = Animal.query.filter_by(id=animal.dam, owner=current_user.id).first()
             if dam:
                 print(dam)
                 form.dam.data = dam.primary_tag
         if animal.sire:
-            sire = Animal.query.filter_by(id=animal.sire).first()
+            sire = Animal.query.filter_by(id=animal.sire, owner=current_user.id).first()
             if sire:
                 form.sire.data = sire.primary_tag
         form.sex.data = animal.sex
@@ -153,6 +192,7 @@ def edit_animal(animal_id):
 
 
 @app.route('/add_weight', methods=['POST'])
+@login_required
 def add_weight():
     form = AddWeightForm()
     print(form.weight.data)
@@ -178,6 +218,7 @@ def add_weight():
 
 
 @app.route('/delete_weight/<animal_id>/<date>', methods=['GET'])
+@login_required
 def delete_weight(animal_id, date):
     weight = Weight.query.filter_by(animal_id=animal_id, date=date).first()
 
@@ -188,6 +229,7 @@ def delete_weight(animal_id, date):
 
 
 @app.route('/delete_animal/<animal_id>', methods=['GET'])
+@login_required
 def delete_animal(animal_id):
 
     db.session.query(Animal).filter_by(id=animal_id).delete()
@@ -199,6 +241,7 @@ def delete_animal(animal_id):
     return redirect(url_for('index'))
 
 @app.route('/add_medicine', methods=['POST'])
+@login_required
 def add_medicine():
     form = AddMedicineForm()
 
@@ -219,3 +262,30 @@ def delete_medicine(animal_id, date, name):
     db.session.commit()
 
     return redirect(url_for('edit_animal', animal_id=animal_id))
+
+
+@app.route('/register', methods=['GET', 'POST'])
+def add_user():
+    form = UserRegistrationForm()
+
+    if form.validate():
+        user = User()
+        form.populate_obj(user)
+
+        # check that the user doesn't exist in the database already
+        if User.query.filter_by(username=user.username).first() is None \
+                and (not user.email or User.query.filter_by(email=user.email).first() is None):
+
+            # they don't so we should add them
+            user.hash_password()
+            db.session.add(user)
+            db.session.commit()
+
+            # user created successfully so log them in and take them to the homepage
+            login_user(user)
+            # return redirect(request.args.get('next'))
+            return redirect(url_for('index'))
+
+            # TODO: user already exists in database, show an error
+
+    return render_template('register_user.html', register_form=form)
