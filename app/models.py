@@ -52,3 +52,4 @@ class Medicine(db.Model):
     dose = db.Column(db.Float)
     unit = db.Column(db.String(10))
     animal_id = db.Column(db.Integer, db.ForeignKey('animal.id'))
+

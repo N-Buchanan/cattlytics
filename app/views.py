@@ -1,7 +1,7 @@
 from flask import render_template, flash, redirect, url_for, request, abort, session
 from flask_login import login_required, login_user, logout_user, current_user
 from app import app, db, login_manager
-from .forms import EditAnimalForm, AddWeightForm, AddMedicineForm, LoginForm, UserRegistrationForm
+from .forms import EditAnimalForm, AddWeightForm, AddMedicineForm, LoginForm, UserRegistrationForm, SearchForm
 from .models import Animal, Weight, Medicine, User
 from .tables import AnimalTable, WeightTable, MedicineTable
 import datetime
@@ -25,17 +25,28 @@ def load_user(userid):
     return User.query.filter_by(id=userid).first()
 
 
-@app.route('/')
-@app.route('/index')
-@app.route('/index/<int:page>')
+@app.route('/', methods=['GET', 'POST'])
+@app.route('/index', methods=['GET', 'POST'])
+@app.route('/index/<int:page>', methods=['GET', 'POST'])
 @login_required
 def index(page=1):
+
+    form = SearchForm()
+
+    search_text=None
+    if form.validate():
+        search_text = form.search_text.data
+
     logging.info('Index accessed by user {}'.format(current_user.id))
+
     # used to map internal database ids to human-readable primary_tag in the animal table
     name_dict = {}
 
-    # animals = Animal.query.filter_by(owner=current_user.id).all()
-    animals = Animal.query.filter_by(owner=current_user.id).paginate(page, ANIMALS_PER_PAGE, False)
+    if search_text is not None:
+        search_text = '%{}%'.format(search_text)
+        animals = Animal.query.filter_by(owner=current_user.id).filter(Animal.primary_tag.like(search_text)).paginate(page, ANIMALS_PER_PAGE, False)
+    else:
+        animals = Animal.query.filter_by(owner=current_user.id).paginate(page, ANIMALS_PER_PAGE, False)
 
     for animal in animals.items:
         animal.weaned = animal.has_weaned()
@@ -45,7 +56,7 @@ def index(page=1):
     table.dam.choices = name_dict
     table.sire.choices = name_dict
     logging.info('Displaying table containng {} animals to user {}'.format(len(animals.items), current_user.id))
-    return render_template('index.html', title='Cattlytics', name='Test', table=table, animals=animals)
+    return render_template('index.html', title='Cattlytics', name='Test', table=table, animals=animals, search_from=form)
 
 
 @app.route('/login', methods=['GET', 'POST'])
@@ -111,7 +122,7 @@ def add_animal():
         if form.dam.data:  # but only if a dam was given
             dam = Animal.query.filter_by(primary_tag=form.dam.data, owner=current_user.id).first()
             if not dam:
-                dam = Animal(primary_tag=form.dam.data)
+                dam = Animal(primary_tag=form.dam.data, owner=current_user.id)
                 db.session.add(dam)
                 db.session.commit()
 
@@ -121,7 +132,7 @@ def add_animal():
         if form.sire.data:
             sire = Animal.query.filter_by(primary_tag=form.sire.data, owner=current_user.id).first()
             if not sire:
-                sire = Animal(primary_tag=form.sire.data)
+                sire = Animal(primary_tag=form.sire.data, owner=current_user.id)
                 db.session.add(sire)
                 db.session.commit()
 

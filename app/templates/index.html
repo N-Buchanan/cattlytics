@@ -14,6 +14,11 @@ display:none
 
 
 {% block content %}
+<form action="" method="post" name="">
+	{{ search_from.hidden_tag() }}
+	{{ search_from.search_text }}{{ search_from.submit }}
+</form>
+
 <div>
 {{ table }}
 </div>
