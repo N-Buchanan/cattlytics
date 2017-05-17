@@ -18,7 +18,7 @@ display:none
 {{ table }}
 </div>
 
-{% if animals.has_prev %}<a href="{{ url_for('index', page=animals.prev_num) }}">Previous Page</a>{% else %}Previous Page{% endif %}
+{% if animals.has_prev %}<a href="{{ url_for('index', page=animals.prev_num) }}">Previous Page</a>{% else %}Previous Page{% endif %} |
 {% if animals.has_next %}<a href="{{ url_for('index', page=animals.next_num) }}">Next Page</a>{% else %}Next Page{% endif %}
 
 {% endblock %}
