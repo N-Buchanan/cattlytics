@@ -6,6 +6,8 @@ from .models import Animal, Weight, Medicine, User
 from .tables import AnimalTable, WeightTable, MedicineTable
 import datetime
 from .algorithms.cow_math import calculate_weaning_weight
+import logging
+from config import ANIMALS_PER_PAGE
 
 
 @app.errorhandler(404)
@@ -25,20 +27,25 @@ def load_user(userid):
 
 @app.route('/')
 @app.route('/index')
+@app.route('/index/<int:page>')
 @login_required
-def index():
+def index(page=1):
+    logging.info('Index accessed by user {}'.format(current_user.id))
     # used to map internal database ids to human-readable primary_tag in the animal table
     name_dict = {}
 
-    animals = Animal.query.filter_by(owner=current_user.id).all()
-    for animal in animals:
+    # animals = Animal.query.filter_by(owner=current_user.id).all()
+    animals = Animal.query.filter_by(owner=current_user.id).paginate(page, ANIMALS_PER_PAGE, False)
+
+    for animal in animals.items:
         animal.weaned = animal.has_weaned()
         name_dict[animal.id] = animal.primary_tag
 
-    table = AnimalTable(animals)
+    table = AnimalTable(animals.items)
     table.dam.choices = name_dict
     table.sire.choices = name_dict
-    return render_template('index.html', title='Cattlytics', name='Test', table=table)
+    logging.info('Displaying table containng {} animals to user {}'.format(len(animals.items), current_user.id))
+    return render_template('index.html', title='Cattlytics', name='Test', table=table, animals=animals)
 
 
 @app.route('/login', methods=['GET', 'POST'])
@@ -47,10 +54,12 @@ def login():
 
     if form.validate():
         user = User.query.filter_by(username=form.username.data).first()
-        if user.verify_password(form.password.data):
+        if user is not None and user.verify_password(form.password.data):
+            logging.info('Logging in user {}'.format(user.id))
             login_user(user)
             return redirect(url_for('index'))
         else:
+            logging.info('Incorrect password supplied for {}'.format(form.username.data))
             return abort(401)
     # else:
     #     print('couldnt validate?')
@@ -62,6 +71,7 @@ def login():
 @app.route('/logout')
 @login_required
 def logout():
+    logging.info('Logging out user {}'.format(current_user.id))
     logout_user()
     return redirect(url_for('index'))
 
@@ -289,3 +299,4 @@ def add_user():
             # TODO: user already exists in database, show an error
 
     return render_template('register_user.html', register_form=form)
+
