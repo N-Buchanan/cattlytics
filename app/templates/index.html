@@ -14,16 +14,30 @@ display:none
 
 
 {% block content %}
-<form action="" method="post" name="">
+<form action="" method="post" name="" class="form" style="" class="form-inline">
 	{{ search_from.hidden_tag() }}
-	{{ search_from.search_text }}{{ search_from.submit }}
+	{{ search_from.search_text(class="form-control mb-2 mr-sm-2 mb-sm-0", placeholder="Search Text") }}
+	{{ search_from.submit(class="btn btn-primary") }}
 </form>
 
-<div>
+<div class="table-responsive">
 {{ table }}
 </div>
 
-{% if animals.has_prev %}<a href="{{ url_for('index', page=animals.prev_num) }}">Previous Page</a>{% else %}Previous Page{% endif %} |
-{% if animals.has_next %}<a href="{{ url_for('index', page=animals.next_num) }}">Next Page</a>{% else %}Next Page{% endif %}
+<ul class="pagination">
+	<li class="page-item">
+		{% if not animals.has_prev %}<li class="page-item disabled">{% endif%}
+		<a href="{{ url_for('index', page=animals.prev_num) }}" role="button" class="page-link">Previous</a>
+		{% if not animals.has_prev %}</li>{% endif%}
+	</li>
+	{% for i in page_nums %}
+		<li class="page-item"><a class="page-link" href="{{ url_for('index', page=i) }}">{{ i }}</a></li>
+	{% endfor %}
+	<li class="page-item">
+		{% if not animals.has_next %}<li class="page-item disabled">{% endif%}
+		<a href="{{ url_for('index', page=animals.next_num) }}" role="button" class="page-link">Next</a>
+		{% if not animals.has_next %}</li>{% endif%}
+	</li>
+</ul>
 
 {% endblock %}

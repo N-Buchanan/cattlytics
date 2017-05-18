@@ -31,22 +31,22 @@ def load_user(userid):
 @login_required
 def index(page=1):
 
+    logging.info('Index accessed by user {}'.format(current_user.id))
+
     form = SearchForm()
 
     search_text=None
     if form.validate():
         search_text = form.search_text.data
 
-    logging.info('Index accessed by user {}'.format(current_user.id))
-
-    # used to map internal database ids to human-readable primary_tag in the animal table
-    name_dict = {}
-
     if search_text is not None:
         search_text = '%{}%'.format(search_text)
         animals = Animal.query.filter_by(owner=current_user.id).filter(Animal.primary_tag.like(search_text)).paginate(page, ANIMALS_PER_PAGE, False)
     else:
         animals = Animal.query.filter_by(owner=current_user.id).paginate(page, ANIMALS_PER_PAGE, False)
+
+    # used to map internal database ids to human-readable primary_tag in the animal table
+    name_dict = {}
 
     for animal in animals.items:
         animal.weaned = animal.has_weaned()
@@ -55,8 +55,20 @@ def index(page=1):
     table = AnimalTable(animals.items)
     table.dam.choices = name_dict
     table.sire.choices = name_dict
+
     logging.info('Displaying table containng {} animals to user {}'.format(len(animals.items), current_user.id))
-    return render_template('index.html', title='Cattlytics', name='Test', table=table, animals=animals, search_from=form)
+
+    # we want to display some page numbers in the pagination nav if there are enough pages to warrant it
+    page_nums = [1]
+    if animals.pages > 2:
+        min_page = max(1, page - 2)
+        max_page = min(animals.pages, page + 2)
+        page_nums = range(min_page, max_page + 1)
+
+    print(page_nums)
+    print(animals.pages)
+    return render_template('index.html', title='Cattlytics',
+            table=table, animals=animals, search_from=form, page_nums=page_nums)
 
 
 @app.route('/login', methods=['GET', 'POST'])
@@ -76,7 +88,7 @@ def login():
     #     print('couldnt validate?')
     #     return abort(401)
 
-    return render_template('login.html', login_form=form)
+    return render_template('login.html', title='Login', login_form=form)
 
 
 @app.route('/logout')
@@ -309,5 +321,5 @@ def add_user():
 
             # TODO: user already exists in database, show an error
 
-    return render_template('register_user.html', register_form=form)
+    return render_template('register_user.html', title='Register', register_form=form)
 

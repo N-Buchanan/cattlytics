@@ -1,14 +1,16 @@
 {% extends 'base.html' %}
 
 {% block content %}
-<h1>Register</h1>
-{#        <form action="{{  url_for('add_user') }}" method="post" name="">#}
-        <form action="" method="post" name="">
-            {{ register_form.hidden_tag() }}
-            <p>Email Address {{ register_form.email }} (this may be left blank)</p>
-            <p>Username {{ register_form.username }}</p>
-            <p>Password {{ register_form.password }}</p>
+<form action="" method="post" name="" class="form">
+	<h1>Register</h1>
+	{{ register_form.hidden_tag() }}
+	<label class="sr-only">Email Address</label>
+		{{ register_form.email(class="form-control", placeholder="Email Address (optional)") }}
+	<label class="sr-only">Username</label>
+		{{ register_form.username(class="form-control", placeholder="Username") }}
+	<label class="sr-only">Password</label>
+		{{ register_form.password(class="form-control", placeholder="Password") }}
 
-        {{ register_form.submit }}
-        </form>
+	{{ register_form.submit(class="btn btn-lg btn-primary") }}
+</form>
 {% endblock %}

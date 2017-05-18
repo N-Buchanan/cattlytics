@@ -13,54 +13,65 @@
 {% endblock %}
 
 {% block content %}
-    <h1>Update Animal Data</h1>
+<h1>Update Animal Data</h1>
 
 
-<form action="" method="post" name="edit">
-    {{ form.hidden_tag() }}
+<form action="" method="post" name="edit" class="form form-horizontal">
+	{{ form.hidden_tag() }}
 
-    <p>
-        Primary Tag
-        {{ form.primary_tag(size=15) }}
-        {% if 'primary_tag' in form.errors %}
-        <p style="color: red">This Field is required</p>
-        {% endif %}
-    </p>
-    <p>
-        Birth Date
-        {{ form.birth_date }}
-        {% if 'birth_date' in form.errors %}
-            <p style="color: red">This field is required</p>
-        {% endif %}
-    </p>
-    <p>
-        Birth Weight
-        {{ form.birth_weight }}
-        {% if 'birth_weight' in form.errors %}
-            <p style="color: red">This field is required</p>
-        {% endif %}
-    </p>
-<p>
-    Dam
-    {{ form.dam }}
-</p>
-<p>
-    Sire
-    {{ form.sire }}
-</p>
-<p>
-    Sex
-    {{ form.sex }}
-</p>
+	<div class="form-group">
+		<label class="col-sm-2 col-form-label">Primary Tag</label>
+		<div class="col-sm-10">
+			{{ form.primary_tag(size=15, class="form-control") }}
+		</div>
+		{% if 'primary_tag' in form.errors %}
+		<p style="color: red">This Field is required</p>
+		{% endif %}
 
-    {{ form.submit }}
+		<label class="col-sm-2 col-form-label">Birth Date</label>
+		<div class="col-sm-10">
+			{{ form.birth_date(class="form-control") }}
+		</div>
+		{% if 'birth_date' in form.errors %}
+		<p style="color: red">This field is required</p>
+		{% endif %}
 
+		<label class="col-sm-2 col-form-label">Birth Weight</label>
+		<div class="col-sm-10">
+			{{ form.birth_weight(class="form-control") }}
+		</div>
+		{% if 'birth_weight' in form.errors %}
+		<p style="color: red">This field is required</p>
+		{% endif %}
+	</div>
 
+	<div class="form-group">
+		<label class="col-sm-2 col-form-label">Dam</label>
+		<div class="col-sm-10">
+			{{ form.dam(class="form-control") }}
+		</div>
+		<label class="col-sm-2 col-form-label">Sire</label>
+		<div class="col-sm-10">
+			{{ form.sire(class="form-control") }}
+		</div>
+	</div>
+
+	<div class="form-group">
+		<label class="col-sm-2 col-form-label">Sex</label>
+		<div class="col-sm-10">
+			{{ form.sex(class="form-control") }}
+		</div>
+	</div>
+
+	{{ form.submit(class="btn btn-primary") }}
 </form>
 
-    <a href="/delete_animal/{{ animal }}">Delete Animal</a>
+<div class="container">
+    <a href="/delete_animal/{{ animal }}" class="btn btn-danger" role="button">Delete Animal</a>
 
     <p>{{ form.primary_tag.data }} is {{ age }} days old.</p>
+</div>
+
 <h1>Animal Weights</h1>
 
     {% if adjusted_weight  %}
@@ -71,17 +82,34 @@
 
 
 <h3>Add a new Weight for this animal.</h3>
-    <form action="{{ url_for('add_weight') }}" method="post" name="">
+    <form action="{{ url_for('add_weight') }}" method="post" name="" class="form">
     {{ weight_form.hidden_tag() }}
 
-        <p>Date {{ weight_form.date }}</p>
-        <p>Weight {{ weight_form.weight }}</p>
-        <p>This is the weaning weight {{ weight_form.weaning }}</p>
+    <div class="form-group row">
+	    <label for="weight-input-date" class="col-sm-2 col-form-label">Date</label>
+	    <div class="col-sm-10">
+		    {{ weight_form.date(class="form-control", id="weight-input-date", type="date") }}
+	    </div>
+    </div>
+
+    <div class="form-group row">
+	    <label for="weight-input-weight" class="col-sm-2 col-form-label">Weight</label>
+	    <div class="col-sm-10">
+		    {{ weight_form.weight(class="form-control", id="weight-input-weight") }}
+	    </div>
+    </div>
+
+    <div class="form-group row">
+	    <label for="weight-input-weaning" class="col-sm-2 col-form-label">This is the weaning weight</label>
+	    <div class="col-sm-10">
+		    {{ weight_form.weaning(class="form-check-input", id="weight-input-weaning") }}
+	    </div>
+    </div>
 
         {% if weight_form.errors %}
             <p style="color:red">Both Weight and Date Fields need to be filled out</p>
         {% endif %}
-    {{ weight_form.submit }}
+    {{ weight_form.submit(class="btn btn-primary") }}
     </form>
 
 <h1>Animal Medicine</h1>
@@ -89,18 +117,42 @@
     {{ medicine_table }}
 
     <h3>Add a medicine for this animal.</h3>
-    <form action="{{  url_for('add_medicine') }}" method="post" name="">
+    <form action="{{  url_for('add_medicine') }}" method="post" name="" class="form">
     {{ medicine_form.hidden_tag() }}
-        <p>Name {{ medicine_form.name }}</p>
-        <p>Date {{ medicine_form.date }}</p>
-        <p>Dose {{ medicine_form.dose }}</p>
-        <p>Unit {{ medicine_form.unit }}</p>
+
+    <div class="form-group">
+	    <label class="col-sm-2 col-form-control">Name</label>
+	    <div class="col-sm-10">
+		    {{ medicine_form.name(class="form-control") }}
+	    </div>
+    </div>
+
+    <div class="form-group">
+	    <label class="col-sm-2 col-form-control">Date</label>
+	    <div class="col-sm-10">
+		    {{ medicine_form.date(class="form-control") }}
+	    </div>
+    </div>
+
+    <div class="form-group">
+	    <label class="col-sm-2 col-form-control">Dose</label>
+	    <div class="col-sm-10">
+		    {{ medicine_form.dose(class="form-control") }}
+	    </div>
+    </div>
+
+    <div class="form-group">
+	    <label class="col-sm-2 col-form-control">Unit</label>
+	    <div class="col-sm-10">
+		    {{ medicine_form.unit(class="form-control") }}
+	    </div>
+    </div>
 
         {% if medicine_form.errors %}
             <p style="color:red">All fields are required</p>
         {% endif %}
 
-    {{ medicine_form.submit }}
+    {{ medicine_form.submit(class="btn btn-primary") }}
     </form>
 
 {% endblock %}

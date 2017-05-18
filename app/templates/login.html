@@ -1,14 +1,22 @@
 {% extends 'base.html' %}
 {% block header_extension %}<a href="/register">Register</a>{% endblock %}
 {% block content %}
-    <h1>Login</h1>
 
-        <form action="" method="post" name="">
-            {{ login_form.hidden_tag() }}
-            <p>Username {{ login_form.username }}</p>
-            <p>Password {{ login_form.password }}</p>
+<div class="container">
+<form action="" method="post" name="" class="form-signin">
+	<h1 class="form-signin-heading">Login</h1>
+	{{ login_form.hidden_tag() }}
+	<label class="sr-only">Username</label>
+	<!-- <div class="col-sm-10"> -->
+		{{ login_form.username(class="form-control", placeholder="Username") }}
+	<!-- </div> -->
+	<label class="sr-only">Password</label>
+	<!-- <div class="col-sm-10"> -->
+		{{ login_form.password(class="form-control", placeholder="Password", id="inputUsername") }}
+	<!-- </div> -->
 
-        {{ login_form.submit }}
-        </form>
+	{{ login_form.submit(class="btn btn-lg btn-primary btn-block", id="inputPassword") }}
+</form>
+</div>
 
 {% endblock %}
