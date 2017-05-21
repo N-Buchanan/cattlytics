@@ -72,7 +72,7 @@
     <p>{{ form.primary_tag.data }} is {{ age }} days old.</p>
 </div>
 
-<h1>Animal Weights</h1>
+<h1>Weights</h1>
 
     {% if adjusted_weight  %}
         <p>{{ form.primary_tag.data }}'s adjusted 205 day weight is {{ adjusted_weight }}</p>
@@ -81,7 +81,7 @@
     {{ weights_table }}
 
 
-<h3>Add a new Weight for this animal.</h3>
+<h3>Add a new Weight.</h3>
     <form action="{{ url_for('add_weight') }}" method="post" name="" class="form">
     {{ weight_form.hidden_tag() }}
 
@@ -112,11 +112,11 @@
     {{ weight_form.submit(class="btn btn-primary") }}
     </form>
 
-<h1>Animal Medicine</h1>
+<h1>Medicine</h1>
 
     {{ medicine_table }}
 
-    <h3>Add a medicine for this animal.</h3>
+    <h3>Add a medicine.</h3>
     <form action="{{  url_for('add_medicine') }}" method="post" name="" class="form">
     {{ medicine_form.hidden_tag() }}
 
