@@ -65,8 +65,6 @@ def index(page=1):
         max_page = min(animals.pages, page + 2)
         page_nums = range(min_page, max_page + 1)
 
-    print(page_nums)
-    print(animals.pages)
     return render_template('index.html', title='Cattlytics',
             table=table, animals=animals, search_from=form, page_nums=page_nums)
 
@@ -193,7 +191,6 @@ def edit_animal(animal_id):
         if animal.dam:
             dam = Animal.query.filter_by(id=animal.dam, owner=current_user.id).first()
             if dam:
-                print(dam)
                 form.dam.data = dam.primary_tag
         if animal.sire:
             sire = Animal.query.filter_by(id=animal.sire, owner=current_user.id).first()
@@ -228,11 +225,9 @@ def edit_animal(animal_id):
 @login_required
 def add_weight():
     form = AddWeightForm()
-    print(form.weight.data)
 
     # if form.validate():
     if form.weight.data and form.date.data:
-        print('ns')
         weight = Weight()
 
         # populate from form data
@@ -244,7 +239,6 @@ def add_weight():
         db.session.add(weight)
         db.session.commit()
 
-        print(form.animal_id.data)
         return redirect(url_for('edit_animal', animal_id=form.animal_id.data))
 
     return redirect(url_for('edit_animal', animal_id=form.animal_id.data))
